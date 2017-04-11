@@ -2,6 +2,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.*;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -35,7 +37,16 @@ public class BootStrap {
             ServerSocket gossipSocket = new ServerSocket(PortConstants.GOSSIP_PORT);
             ServerSocket dataSocket = new ServerSocket(PortConstants.DATA_PORT);
             ServerSocket replicaSocket = new ServerSocket(PortConstants.REPLICA_PORT);
-            gossipSocket.accept();
+            AcceptSelector acceptSelector = AcceptSelector.getInstance();
+            Selector selector = acceptSelector.getSelector();
+            gossipSocket.getChannel().configureBlocking(false).
+                    register(selector, SelectionKey.OP_ACCEPT);
+            dataSocket.getChannel().configureBlocking(false).
+                    register(selector, SelectionKey.OP_ACCEPT);
+            replicaSocket.getChannel().configureBlocking(false).
+                    register(selector, SelectionKey.OP_ACCEPT);
+            acceptSelector.startup();
+
             ArrayList<Server> servers = ServerPeers.getServerPeers();
             for (Server server : servers) {
                 Socket socket = new Socket(InetAddress.getLocalHost(), 0);

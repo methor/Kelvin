@@ -8,6 +8,8 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.channels.SocketChannel;
+import java.util.Arrays;
 
 /**
  * Created by mio on 2017/4/5.
@@ -21,30 +23,43 @@ public class DataChannel {
         try {
             Socket socket = new Socket(InetAddress.getLocalHost(), 0);
             socket.connect(new InetSocketAddress(address, port));
-            OutputStream outputStream = socket.getOutputStream();
-            ByteBuffer b = ByteBuffer.allocate(LEN_BYTES);
-            b.order(ByteOrder.BIG_ENDIAN);
-            b.putInt(data.length);
-            outputStream.write(b.array());
-            outputStream.write(data);
+
+            SocketChannel channel = socket.getChannel();
+
+            ByteBuffer preamble = ByteBuffer.allocate(LEN_BYTES);
+            preamble.order(ByteOrder.BIG_ENDIAN);
+            preamble.putInt(data.length);
+
+            channel.write(preamble);
+            channel.write(ByteBuffer.wrap(data));
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static Optional<byte[]> recv(Socket socket) {
+    public static Optional<NetworkEvent> recv(Socket socket) {
 
         try {
-            InputStream inputStream = socket.getInputStream();
-            ByteBuffer preamble = ByteBuffer.allocate(LEN_BYTES);
-            inputStream.read(preamble.array());
-            preamble.order(ByteOrder.BIG_ENDIAN);
+            SocketChannel channel = socket.getChannel();
+
+            ByteBuffer preamble =
+                    ByteBuffer.allocate(LEN_BYTES).order(ByteOrder.BIG_ENDIAN);
+            channel.read(preamble);
             int len = preamble.getInt();
 
-            byte[] data = new byte[len];
-            inputStream.read(data);
+            ByteBuffer payload =
+                    ByteBuffer.wrap(new byte[len]).order(ByteOrder.BIG_ENDIAN);
 
-            return Optional.of(data);
+            channel.read(payload);
+
+
+            int type = payload.getInt();
+
+            NetworkEvent e = new NetworkEvent(socket.getInetAddress(), type,
+                    payload.slice().array());
+
+            return Optional.of(e);
         } catch (IOException e) {
             e.printStackTrace();
         }
