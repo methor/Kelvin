@@ -54,8 +54,8 @@ public class AcceptSelector {
                             and what major and then transfer the data as well as the
                             minor type to the corresponding handler strategy.
                         */
-                        DataIoThreadPool.getInstance().getExecutorService()
-                                .submit();
+//                        DataIoThreadPool.getInstance().getExecutorService()
+//                                .submit();
                     }
                 }
             } catch (IOException e)
