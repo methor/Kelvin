@@ -13,6 +13,8 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.util.concurrent.DefaultEventExecutorGroup;
+import io.netty.util.concurrent.EventExecutorGroup;
 import io.netty.util.concurrent.GenericFutureListener;
 
 import java.io.*;
@@ -56,6 +58,8 @@ public class BootStrap {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         EventLoopGroup clientWorkerGroup = new NioEventLoopGroup();
+        EventExecutorGroup eventExecutorGroup = new DefaultEventExecutorGroup(4);
+
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
@@ -68,26 +72,7 @@ public class BootStrap {
                                             ByteOrder.BIG_ENDIAN, Short.MAX_VALUE, 0, 2, 0, 2, true))
                                     .addLast(new StringDecoder(Charset.forName("utf-8")))
                                     //.addLast(new LoggingHandler(LogLevel.INFO))
-                                    .addLast(new ChannelInboundHandlerAdapter() {
-                                        @Override
-                                        public void channelRead(ChannelHandlerContext ctx, Object msg)  {
-                                            String s = (String) msg;
-                                            System.out.println(s);
-                                            Writer writer = null;
-                                            try {
-                                                writer = new FileWriter(new File("C:\\Users\\mio\\Desktop\\recv.txt"), true);
-                                                writer.write("abc" + s + "\n");
-                                                writer.close();
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
-                                            }
-
-//                                            PrintWriter printWriter = new PrintWriter(new File("C:\\Users\\mio\\Desktop\\recv1.txt"));
-//                                            printWriter.append(s);
-//                                            //printWriter.flush();
-//                                            printWriter.close();
-                                        }
-                                    });
+                                    ;
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)
