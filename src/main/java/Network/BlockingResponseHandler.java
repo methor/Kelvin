@@ -1,21 +1,26 @@
-import io.netty.channel.ChannelDuplexHandler;
+package Network;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelPromise;
 import io.netty.util.AttributeKey;
-
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by mio on 2017/4/16.
  */
 public class BlockingResponseHandler extends ChannelInboundHandlerAdapter {
 
-    private final MessageBlockingQueue messageBlockingQueue = new MessageBlockingQueue();
+    private final MessageBlockingQueue messageBlockingQueue;
     private static final AttributeKey<MessageBlockingQueue> QUEUE =
             AttributeKey.valueOf("blocking queue");
 
+    public BlockingResponseHandler()
+    {
+        this.messageBlockingQueue = new MessageBlockingQueue();
+    }
+    public BlockingResponseHandler(int capacity)
+    {
+        this.messageBlockingQueue = new MessageBlockingQueue(capacity);
+    }
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {

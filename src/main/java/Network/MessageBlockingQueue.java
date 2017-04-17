@@ -1,3 +1,5 @@
+package Network;
+
 import com.google.common.base.Optional;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -20,11 +22,12 @@ public class MessageBlockingQueue {
         }
     }
 
-    private static final int CAPACITY = 100000;
+    private static final int CAPACITY = 100;
 
-
-
-
+    /**
+     * this variable is only be used to be set and decrement by ONE thread, so no
+     * synchronization is applied.
+     */
     private int toBeRemoved = 0;
 
 
@@ -44,6 +47,7 @@ public class MessageBlockingQueue {
     }
 
     public Optional poll(long timeout, TimeUnit unit) {
+        // retrieve object in the head
         if (toBeRemoved == 0)
             try {
                 return Optional.fromNullable(queue.poll(timeout, unit));
@@ -51,17 +55,33 @@ public class MessageBlockingQueue {
                 e.printStackTrace();
                 return Optional.absent();
             }
+        // discard toBeRemoved objects, and measure each time interval between successive
+        // poll invocation to decide whether timed out.
         else {
             try {
-                Thread.sleep(1,2);
+                long nanoTimeout = unit.toNanos(timeout);
+                long residual = nanoTimeout;
+                long t0 = System.nanoTime();
+
                 while (toBeRemoved > 0) {
-                    Object object = queue.poll();
+                    Object object = queue.poll(residual, TimeUnit.NANOSECONDS);
                     if (object != null)
+                    {
                         toBeRemoved--;
+                        long t1 = System.nanoTime();
+                        if (t1 - t0 >= nanoTimeout)
+                            return Optional.absent();
+                        residual = nanoTimeout - t1 + t0;
+                    }
                     else
                         return Optional.absent();
                 }
-                return Optional.fromNullable(queue.poll());
+                long t1 = System.nanoTime();
+                if (t1 - t0 < nanoTimeout)
+                    return Optional.fromNullable(queue.poll(nanoTimeout - t1 + t0,
+                        TimeUnit.NANOSECONDS));
+                else
+                    return Optional.absent();
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 return Optional.absent();
