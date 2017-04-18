@@ -6,7 +6,7 @@ import java.util.ArrayList;
 /**
  * Created by mio on 2017/4/5.
  */
-public class SeedServer {
+public class Server {
     public String getName() {
         return name;
     }
@@ -18,7 +18,7 @@ public class SeedServer {
     private final String name;
     private final InetAddress address;
 
-    public SeedServer(String name, InetAddress address) {
+    public Server(String name, InetAddress address) {
         this.name = name;
         this.address = address;
     }

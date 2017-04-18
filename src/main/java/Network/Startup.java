@@ -9,6 +9,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.json.JsonObjectDecoder;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import io.netty.util.concurrent.EventExecutorGroup;
 import io.netty.util.concurrent.GenericFutureListener;
@@ -23,7 +24,7 @@ import java.util.Scanner;
 /**
  * Created by mio on 2017/4/5.
  */
-public class BootStrap {
+public class Startup {
 
     public static void main(String[] args) {
 
@@ -62,7 +63,9 @@ public class BootStrap {
                             ch.pipeline()
                                     .addLast(new LengthFieldBasedFrameDecoder(
                                             ByteOrder.BIG_ENDIAN, Short.MAX_VALUE, 0, 2, 0, 2, true))
-                                    .addLast(new BlockingResponseHandler())
+                                    .addLast(new JsonObjectDecoder(true))
+                                    .addLast(new ChannelRegisterHandler())
+                                    .addLast(eventExecutorGroup, new BlockingResponseHandler())
                                     //.addLast(new LoggingHandler(LogLevel.INFO))
                                     ;
                         }
@@ -70,21 +73,15 @@ public class BootStrap {
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-            GenericFutureListener listener = new ChannelFutureListener() {
-                @Override
-                public void operationComplete(ChannelFuture future) throws Exception {
-                    if (future.isSuccess())
-                        return;
-                }
-            };
 
-            b.bind(PortConstants.GOSSIP_PORT).addListener(listener);
-            b.bind(PortConstants.DATA_PORT).addListener(listener);
-            b.bind(PortConstants.REPLICA_PORT).addListener(listener);
+
+            b.bind(PortConstants.GOSSIP_PORT).sync();
+            b.bind(PortConstants.DATA_PORT).sync();
+            b.bind(PortConstants.REPLICA_PORT).sync();
 
             Thread.sleep(5000);
 
-            Bootstrap cb = new Bootstrap();
+            io.netty.bootstrap.Bootstrap cb = new io.netty.bootstrap.Bootstrap();
             cb.group(clientWorkerGroup)
                     .channel(NioSocketChannel.class)
                     .handler(new ChannelInitializer<SocketChannel>() {
@@ -94,7 +91,9 @@ public class BootStrap {
                                     //.addLast(new StringEncoder(Charset.forName("utf-8")))
                                     .addLast(new LengthFieldPrepender(
                                             ByteOrder.BIG_ENDIAN, 2, 0, false))
-                                    .addLast(new BlockingResponseHandler())
+                                    .addLast(new JsonObjectDecoder(true))
+                                    .addLast(new ChannelRegisterHandler())
+                                    .addLast(eventExecutorGroup, new BlockingResponseHandler())
 
                             ;
 
@@ -103,7 +102,7 @@ public class BootStrap {
 
             List<Channel> channels = new ArrayList<>();
 
-            for (SeedServer seedServer : ServerPeers.getSeedServerPeers()) {
+            for (Server seedServer : ServerPeers.getServerPeers()) {
                 cb.connect(seedServer.getAddress(), PortConstants.GOSSIP_PORT);
                 channels.add(cb.connect(seedServer.getAddress(), PortConstants.DATA_PORT).channel());
                 cb.connect(seedServer.getAddress(), PortConstants.REPLICA_PORT);
@@ -134,8 +133,8 @@ public class BootStrap {
 //                    register(selector, SelectionKey.OP_ACCEPT);
 //            acceptSelector.startup();
 //
-//            ArrayList<Network.SeedServer> servers = Network.ServerPeers.getSeedServerPeers();
-//            for (Network.SeedServer server : servers) {
+//            ArrayList<Network.Server> servers = Network.ServerPeers.getServerPeers();
+//            for (Network.Server server : servers) {
 //                Socket socket = new Socket(InetAddress.getLocalHost(), 0);
 //                socket.connect(new InetSocketAddress(server.getAddress(), Network.PortConstants.GOSSIP_PORT));
 //            }
