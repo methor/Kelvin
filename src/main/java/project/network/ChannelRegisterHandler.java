@@ -1,4 +1,4 @@
-package Network;
+package project.network;
 
 import io.netty.channel.*;
 

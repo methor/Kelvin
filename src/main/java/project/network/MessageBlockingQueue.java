@@ -1,11 +1,10 @@
-package Network;
+package project.network;
 
 import com.google.common.base.Optional;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by mio on 2017/4/16.

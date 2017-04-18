@@ -1,4 +1,4 @@
-package Network;
+package project.network;
 
 import com.google.common.base.Optional;
 import io.netty.channel.Channel;

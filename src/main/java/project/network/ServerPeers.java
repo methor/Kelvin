@@ -1,4 +1,4 @@
-package Network;
+package project.network;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
