@@ -16,20 +16,47 @@ import java.util.Scanner;
  */
 public class DiscardClient {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception
+    {
 
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-        try {
+        try
+        {
             Bootstrap b = new Bootstrap(); // (1)
             b.group(workerGroup); // (2)
             b.channel(NioSocketChannel.class); // (3)
             b.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
-                public void initChannel(SocketChannel ch) throws Exception {
+                public void initChannel(SocketChannel ch) throws Exception
+                {
                     ch.pipeline()
                             .addLast(new LoggingHandler(LogLevel.INFO))
-                    .addLast(new DiscardClientHandler());
+                            //.addLast(new DiscardClientHandler())
+                            .addLast(new ChannelDuplexHandler() {
+                                @Override
+                                public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception
+                                {
+                                    promise.addListener(new ChannelFutureListener() {
+                                        @Override
+                                        public void operationComplete(ChannelFuture future) throws Exception
+                                        {
+                                            System.out.println(ctx.channel().remoteAddress());
+                                        }
+                                    });
+                                    super.close(ctx, promise);
+                                }
+
+
+
+                                @Override
+                                public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
+                                {
+                                    ctx.close();
+                                }
+                            })
+                    ;
+
                 }
             });
 
@@ -39,9 +66,11 @@ public class DiscardClient {
             Channel cl = f.channel();
 
             Scanner in = new Scanner(System.in);
-            while (in.hasNextLine()) {
+            while (in.hasNextLine())
+            {
                 String line = in.nextLine();
-                if (line.equals("quit")) {
+                if (line.equals("quit"))
+                {
                     f.channel().close();
                     break;
                 }
@@ -57,8 +86,9 @@ public class DiscardClient {
             }
 
             // Wait until the connection is closed.
-            f.channel().closeFuture().sync();
-        } finally {
+            //f.channel().closeFuture().sync();
+        } finally
+        {
             workerGroup.shutdownGracefully();
         }
     }

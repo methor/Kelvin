@@ -10,51 +10,29 @@ import java.net.SocketAddress;
 public class ChannelRegisterHandler extends ChannelDuplexHandler {
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        Channels.putServerSideChannel(ctx.channel().remoteAddress(), ctx.channel());
-        super.channelActive(ctx);
-    }
-
-    @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        Channels.removeServerSideChannel(ctx.channel().remoteAddress());
+        Channels.removeChannel(ctx.channel().remoteAddress());
+        ctx.pipeline().remove(BlockingResponseHandler.NAME);
         super.channelInactive(ctx);
     }
 
     @Override
-    public void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception {
+    public void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception
+    {
         promise.addListener(new ChannelFutureListener() {
             @Override
-            public void operationComplete(ChannelFuture future) throws Exception {
+            public void operationComplete(ChannelFuture future) throws Exception
+            {
                 if (future.isSuccess())
-                    Channels.putClientSideChannel(remoteAddress, ctx.channel());
+                    Channels.putChannel(remoteAddress, ctx.channel());
             }
         });
         super.connect(ctx, remoteAddress, localAddress, promise);
     }
 
     @Override
-    public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-        promise.addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture future) throws Exception {
-                if (future.isSuccess())
-                    Channels.removeClientSideChannel(ctx.channel().remoteAddress());
-            }
-        });
-        super.disconnect(ctx, promise);
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
+    {
+        ctx.close();
     }
-
-    @Override
-    public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-        promise.addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture future) throws Exception {
-                if (future.isSuccess())
-                    Channels.removeClientSideChannel(ctx.channel().remoteAddress());
-            }
-        });
-        super.close(ctx, promise);
-    }
-
 }

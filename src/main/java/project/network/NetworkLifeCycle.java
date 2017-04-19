@@ -11,6 +11,7 @@ import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.json.JsonObjectDecoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.util.concurrent.BlockingOperationException;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import io.netty.util.concurrent.EventExecutorGroup;
 import project.GlobalConfiguration;
@@ -44,8 +45,7 @@ public class NetworkLifeCycle {
                                     .addLast(new JsonObjectDecoder(true))
                                     .addLast(new LoggingHandler(LogLevel.INFO))
                                     .addLast(new ChannelRegisterHandler())
-                                    .addLast(eventExecutorGroup, new BlockingResponseHandler())
-                                    //.addLast(new LoggingHandler(LogLevel.INFO))
+                                    .addLast(eventExecutorGroup, BlockingResponseHandler.NAME, new BlockingResponseHandler())
                                     ;
                         }
                     })
@@ -58,7 +58,8 @@ public class NetworkLifeCycle {
             b.bind(GlobalConfiguration.getInstance().getDataPort()).sync();
             b.bind(GlobalConfiguration.getInstance().getReplicaPort()).sync();
 
-            Thread.sleep(5000);
+
+
 
             io.netty.bootstrap.Bootstrap cb = new io.netty.bootstrap.Bootstrap();
             cb.group(clientWorkerGroup)
@@ -73,19 +74,22 @@ public class NetworkLifeCycle {
                                     .addLast(new JsonObjectDecoder(true))
                                     .addLast(new LoggingHandler(LogLevel.INFO))
                                     .addLast(new ChannelRegisterHandler())
-                                    .addLast(eventExecutorGroup, new BlockingResponseHandler())
+                                    .addLast(eventExecutorGroup, BlockingResponseHandler.NAME, new BlockingResponseHandler())
 
                             ;
 
                         }
-                    });
+                    })
+
+
+            ;
 
 
 
             for (InetAddress address : GlobalConfiguration.getInstance().getSeedsAddrs()) {
-                cb.connect(address, PortConstants.GOSSIP_PORT);
-                cb.connect(address, PortConstants.DATA_PORT).channel();
-                cb.connect(address, PortConstants.REPLICA_PORT);
+                cb.connect(address, GlobalConfiguration.getInstance().getGossipPort());
+                cb.connect(address, GlobalConfiguration.getInstance().getDataPort());
+                cb.connect(address, GlobalConfiguration.getInstance().getReplicaPort());
             }
 
 
@@ -99,10 +103,17 @@ public class NetworkLifeCycle {
 
     }
 
-    public static void exit() {
-        bossGroup.shutdownGracefully();
-        workerGroup.shutdownGracefully();
-        clientWorkerGroup.shutdownGracefully();
-        eventExecutorGroup.shutdownGracefully();
+    public static void exit()
+    {
+
+
+            clientWorkerGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully();
+            eventExecutorGroup.shutdownGracefully();
+            bossGroup.shutdownGracefully();
+
+
+
+
     }
 }

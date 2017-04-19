@@ -12,6 +12,7 @@ public class BlockingResponseHandler extends ChannelInboundHandlerAdapter {
     private final MessageBlockingQueue messageBlockingQueue;
     private static final AttributeKey<MessageBlockingQueue> QUEUE =
             AttributeKey.valueOf("blocking queue");
+    public static final String NAME = "BlockingResponseHandler";
 
     public BlockingResponseHandler()
     {
@@ -34,5 +35,6 @@ public class BlockingResponseHandler extends ChannelInboundHandlerAdapter {
         messageBlockingQueue.put(msg);
         //super.channelRead(ctx, msg);
     }
+
 
 }

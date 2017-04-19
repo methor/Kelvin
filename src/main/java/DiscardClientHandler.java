@@ -17,4 +17,5 @@ public class DiscardClientHandler extends ChannelInboundHandlerAdapter {
         System.out.println(new String(bytes));
         //super.channelRead(ctx, msg);
     }
+
 }

@@ -12,40 +12,26 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Channels {
     
-    private static final Map<SocketAddress, Channel> SERVERSIDECHANNELS = new ConcurrentHashMap<>();
-    private static final Map<SocketAddress, Channel> CLIENTSIDECHANNELS = new ConcurrentHashMap<>();
+    private static final Map<SocketAddress, Channel> CHANNELS = new ConcurrentHashMap<>();
+
     
-    public static Optional<Channel> getServerSideChannel(SocketAddress address) {
-        return Optional.fromNullable(SERVERSIDECHANNELS.get(address));
-    }
-    
-    public static Optional<Channel> putServerSideChannel(SocketAddress address, Channel channel) {
-        return Optional.fromNullable(SERVERSIDECHANNELS.put(address, channel));
+    public static Optional<Channel> getChannel(SocketAddress address) {
+        return Optional.fromNullable(CHANNELS.get(address));
     }
     
-    public static Optional<Channel> putServerSideChannelIfAbsent(SocketAddress address, Channel channel) {
-        return Optional.fromNullable(SERVERSIDECHANNELS.putIfAbsent(address, channel));
+    public static Optional<Channel> putChannel(SocketAddress address, Channel channel) {
+        return Optional.fromNullable(CHANNELS.put(address, channel));
+    }
+    
+    public static Optional<Channel> putChannelIfAbsent(SocketAddress address, Channel channel) {
+        return Optional.fromNullable(CHANNELS.putIfAbsent(address, channel));
     }
 
-    public static Optional<Channel> removeServerSideChannel(SocketAddress address) {
-        return Optional.fromNullable(SERVERSIDECHANNELS.remove(address));
+    public static Optional<Channel> removeChannel(SocketAddress address) {
+        return Optional.fromNullable(CHANNELS.remove(address));
     }
 
-    public static Optional<Channel> getClientSideChannel(SocketAddress address) {
-        return Optional.fromNullable(CLIENTSIDECHANNELS.get(address));
-    }
 
-    public static Optional<Channel> putClientSideChannel(SocketAddress address, Channel channel) {
-        return Optional.fromNullable(CLIENTSIDECHANNELS.put(address, channel));
-    }
-
-    public static Optional<Channel> putClientSideChannelIfAbsent(SocketAddress address, Channel channel) {
-        return Optional.fromNullable(CLIENTSIDECHANNELS.putIfAbsent(address, channel));
-    }
-
-    public static Optional<Channel> removeClientSideChannel(SocketAddress address) {
-        return Optional.fromNullable(CLIENTSIDECHANNELS.remove(address));
-    }
     
     
 }

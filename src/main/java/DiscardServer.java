@@ -37,7 +37,8 @@ public class DiscardServer {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO))
-                                    .addLast(new DiscardServerHandler());
+                                    //.addLast(new DiscardServerHandler())
+                            ;
                         }
                     });
 
