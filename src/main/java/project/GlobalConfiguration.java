@@ -22,6 +22,7 @@ public class GlobalConfiguration {
     private List<String> seeds;
     private List<InetAddress> seedsAddrs;
     private File data_file_dir;
+    private int hash_size = 160;
 
     public String getClusterName() {
         return cluster;
@@ -47,6 +48,8 @@ public class GlobalConfiguration {
         return new File(data_file_dir.getPath());
     }
 
+    public int getHashSize() {return hash_size;}
+
 
     private GlobalConfiguration() {
         seeds = new ArrayList<>();
@@ -62,21 +65,22 @@ public class GlobalConfiguration {
     }
 
     @Override
-    public String toString() {
-        return "project.GlobalConfiguration{" +
+    public String toString()
+    {
+        return "GlobalConfiguration{" +
                 "cluster='" + cluster + '\'' +
                 ", data_port=" + data_port +
                 ", gossip_port=" + gossip_port +
                 ", replica_port=" + replica_port +
-                ", seeds=" + seeds +
+                ", seedsAddrs=" + seedsAddrs +
                 ", data_file_dir=" + data_file_dir +
+                ", hash_size=" + hash_size +
                 '}';
     }
 
     public static void readConfig(String file) throws Exception {
         Yaml yaml = new Yaml();
         yaml.setBeanAccess(BeanAccess.FIELD);
-        TypeDescription typeDescription = new TypeDescription(InetAddress.class);
 
         GlobalConfiguration conf = yaml.loadAs(new FileReader(file), GlobalConfiguration.class);
         Holder.INSTANCE = conf;
