@@ -4,5 +4,4 @@ gossip_port: 3042
 replica_port: 3043
 seeds:
 - 127.0.0.1
-- 123.0.0.1
 data_file_dir: C:\Users\mio\Desktop

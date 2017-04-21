@@ -33,7 +33,7 @@ public class DiscardClient {
                     ch.pipeline()
                             .addLast(new LoggingHandler(LogLevel.INFO))
                             //.addLast(new DiscardClientHandler())
-                            .addLast(new ChannelDuplexHandler() {
+                            .addLast("a", new ChannelDuplexHandler() {
                                 @Override
                                 public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception
                                 {
@@ -71,7 +71,7 @@ public class DiscardClient {
                 String line = in.nextLine();
                 if (line.equals("quit"))
                 {
-                    f.channel().close();
+                    f.channel().pipeline().remove("a");
                     break;
                 }
                 byte[] bytes = line.getBytes();

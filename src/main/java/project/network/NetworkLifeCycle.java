@@ -31,7 +31,6 @@ public class NetworkLifeCycle {
     public static void bootstrap() {
 
 
-
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
@@ -46,19 +45,16 @@ public class NetworkLifeCycle {
                                     .addLast(new LoggingHandler(LogLevel.INFO))
                                     .addLast(new ChannelRegisterHandler())
                                     .addLast(eventExecutorGroup, BlockingResponseHandler.NAME, new BlockingResponseHandler())
-                                    ;
+                            ;
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
 
-
             b.bind(GlobalConfiguration.getInstance().getGossipPort()).sync();
             b.bind(GlobalConfiguration.getInstance().getDataPort()).sync();
             b.bind(GlobalConfiguration.getInstance().getReplicaPort()).sync();
-
-
 
 
             io.netty.bootstrap.Bootstrap cb = new io.netty.bootstrap.Bootstrap();
@@ -85,16 +81,11 @@ public class NetworkLifeCycle {
             ;
 
 
-
             for (InetAddress address : GlobalConfiguration.getInstance().getSeedsAddrs()) {
                 cb.connect(address, GlobalConfiguration.getInstance().getGossipPort());
                 cb.connect(address, GlobalConfiguration.getInstance().getDataPort());
                 cb.connect(address, GlobalConfiguration.getInstance().getReplicaPort());
             }
-
-
-
-
 
 
         } catch (InterruptedException e) {
@@ -103,16 +94,13 @@ public class NetworkLifeCycle {
 
     }
 
-    public static void exit()
-    {
+    public static void exit() {
 
 
-            clientWorkerGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
-            eventExecutorGroup.shutdownGracefully();
-            bossGroup.shutdownGracefully();
-
-
+        clientWorkerGroup.shutdownGracefully().syncUninterruptibly();
+        workerGroup.shutdownGracefully().syncUninterruptibly();
+        eventExecutorGroup.shutdownGracefully().syncUninterruptibly();
+        bossGroup.shutdownGracefully().syncUninterruptibly();
 
 
     }
