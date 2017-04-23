@@ -10,7 +10,7 @@ import io.netty.util.AttributeKey;
 public class BlockingResponseHandler extends ChannelInboundHandlerAdapter {
 
     private final MessageBlockingQueue messageBlockingQueue;
-    private static final AttributeKey<MessageBlockingQueue> QUEUE =
+    public static final AttributeKey<MessageBlockingQueue> QUEUE =
             AttributeKey.valueOf("blocking queue");
     public static final String NAME = "BlockingResponseHandler";
 

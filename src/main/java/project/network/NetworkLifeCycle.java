@@ -1,5 +1,6 @@
 package project.network;
 
+import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -27,6 +28,7 @@ public class NetworkLifeCycle {
     static EventLoopGroup workerGroup = new NioEventLoopGroup();
     static EventLoopGroup clientWorkerGroup = new NioEventLoopGroup();
     static EventExecutorGroup eventExecutorGroup = new DefaultEventExecutorGroup(4);
+    static Bootstrap cb;
 
     public static void bootstrap() {
 
@@ -57,7 +59,7 @@ public class NetworkLifeCycle {
             b.bind(GlobalConfiguration.getInstance().getReplicaPort()).sync();
 
 
-            io.netty.bootstrap.Bootstrap cb = new io.netty.bootstrap.Bootstrap();
+            cb = new Bootstrap();
             cb.group(clientWorkerGroup)
                     .channel(NioSocketChannel.class)
                     .handler(new ChannelInitializer<SocketChannel>() {

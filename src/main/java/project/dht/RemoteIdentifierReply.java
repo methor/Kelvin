@@ -6,26 +6,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.common.base.Optional;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 /**
- * Created by Mio on 2017/4/20.
+ * Created by mio on 2017/4/23.
  */
-public class RemoteRequest {
-    public enum Type {
-        SUCCESSOR, FIND_SUCCESSOR, FIND_PREDECESSOR,
-        CLOSEST_PRECEDING_FINGER, NOTIFY
-    }
-
-    public Type type;
+public class RemoteIdentifierReply {
     public Identifier identifier;
+    public InetAddress address;
 
     @JsonCreator
-    public RemoteRequest(@JsonProperty("type") Type t, @JsonProperty("identifier") Identifier id) {
-        type = t;
+    public RemoteIdentifierReply(@JsonProperty("identifier") Identifier id,
+                                 @JsonProperty("address") InetAddress address) {
         identifier = id;
+        this.address = address;
     }
 
     @JsonIgnore
@@ -43,9 +39,9 @@ public class RemoteRequest {
         return null;
     }
 
-    public static RemoteRequest deserializeFromJson(String json) {
+    public static RemoteIdentifierReply deserializeFromJson(String json) {
         try {
-            return mapper.readValue(json, RemoteRequest.class);
+            return mapper.readValue(json, RemoteIdentifierReply.class);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -54,9 +50,9 @@ public class RemoteRequest {
 
     @Override
     public String toString() {
-        return "RemoteRequest{" +
-                "type=" + type +
-                ", identifier=" + identifier +
+        return "RemoteIdentifierReply{" +
+                "identifier=" + identifier +
+                ", address=" + address +
                 '}';
     }
 }

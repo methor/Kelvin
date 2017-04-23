@@ -1,4 +1,5 @@
 import project.dht.Identifier;
+import project.dht.RemoteIdentifierReply;
 import project.dht.RemoteRequest;
 import project.network.NetworkLifeCycle;
 import project.GlobalConfiguration;
@@ -27,9 +28,17 @@ public class LifeCycle {
             RemoteRequest request = new RemoteRequest(RemoteRequest.Type.CLOSEST_PRECEDING_FINGER
             , new Identifier(InetAddress.getByName("127.0.0.1")));
             System.out.println(request.toString());
-            String s = request.serializeToJson().get();
+            String s = request.serializeToJson();
             System.out.println(s);
-            System.out.println(RemoteRequest.deserializeFromJson(s).get());
+            System.out.println(RemoteRequest.deserializeFromJson(s));
+
+            RemoteIdentifierReply reply = new RemoteIdentifierReply(new Identifier(
+                    InetAddress.getByName("127.0.0.1")), InetAddress.getByName("127.0.0.1"));
+            System.out.println(reply.toString());
+            s = reply.serializeToJson();
+            System.out.println(s);
+            System.out.println(RemoteIdentifierReply.deserializeFromJson(s));
+
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }

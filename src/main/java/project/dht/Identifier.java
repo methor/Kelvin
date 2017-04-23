@@ -2,6 +2,7 @@ package project.dht;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.hash.*;
+import io.netty.buffer.ByteBuf;
 import project.GlobalConfiguration;
 
 import javax.security.auth.login.Configuration;
@@ -32,12 +33,23 @@ public class Identifier implements Comparable<Identifier> {
         hc.writeBytesTo(id, 0, len);
     }
 
+    Identifier(Identifier id) {
+        System.arraycopy(id.id, 0, id, 0, len);
+    }
+
     @Override
     public int compareTo(Identifier o)
     {
         ByteBuffer b1 = ByteBuffer.wrap(this.id);
         ByteBuffer b2 = ByteBuffer.wrap(o.id);
         return b1.compareTo(b2);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof Identifier))
+            return false;
+        return Arrays.equals(id, ((Identifier)obj).id);
     }
 
     @Override

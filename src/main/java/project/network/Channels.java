@@ -2,7 +2,9 @@ package project.network;
 
 import com.google.common.base.Optional;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 
+import java.net.InetAddress;
 import java.net.SocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,6 +31,10 @@ public class Channels {
 
     public static Optional<Channel> removeChannel(SocketAddress address) {
         return Optional.fromNullable(CHANNELS.remove(address));
+    }
+
+    public static ChannelFuture connect(InetAddress address, int port) {
+        return NetworkLifeCycle.cb.connect(address, port);
     }
 
 
