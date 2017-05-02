@@ -7,6 +7,7 @@ import project.GlobalConfiguration;
 
 import javax.security.auth.login.Configuration;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -18,12 +19,8 @@ public class Identifier implements Comparable<Identifier> {
     public final byte[] id = new byte[len];
 
     @JsonIgnore
-    Funnel<InetAddress> inetAddressFunnel = new Funnel<InetAddress>() {
-        @Override
-        public void funnel(InetAddress from, PrimitiveSink into) {
-            into.putBytes(from.getAddress());
-        }
-    };
+    static Funnel<InetAddress> inetAddressFunnel = (Funnel<InetAddress>)
+            (from, into) -> into.putBytes(from.getAddress());
     Identifier() {
     }
 
@@ -32,6 +29,7 @@ public class Identifier implements Comparable<Identifier> {
         HashCode hc = hf.newHasher().putObject(address, inetAddressFunnel).hash();
         hc.writeBytesTo(id, 0, len);
     }
+
 
     Identifier(Identifier id) {
         System.arraycopy(id.id, 0, id, 0, len);

@@ -7,13 +7,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.base.Optional;
+import project.JsonMessage;
 
 import java.io.IOException;
 
 /**
  * Created by Mio on 2017/4/20.
  */
-public class RemoteRequest {
+public class RemoteRequest implements JsonMessage {
     public enum Type {
         SUCCESSOR, FIND_SUCCESSOR, FIND_PREDECESSOR,
         CLOSEST_PRECEDING_FINGER, NOTIFY

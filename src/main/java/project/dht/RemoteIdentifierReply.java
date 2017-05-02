@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import project.JsonMessage;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -13,7 +14,7 @@ import java.net.InetAddress;
 /**
  * Created by mio on 2017/4/23.
  */
-public class RemoteIdentifierReply {
+public class RemoteIdentifierReply implements JsonMessage {
     public Identifier identifier;
     public InetAddress address;
 

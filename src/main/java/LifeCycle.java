@@ -1,11 +1,14 @@
 import project.dht.Identifier;
 import project.dht.RemoteIdentifierReply;
 import project.dht.RemoteRequest;
+import project.gossip.NodeInfo;
 import project.network.NetworkLifeCycle;
 import project.GlobalConfiguration;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -32,12 +35,22 @@ public class LifeCycle {
             System.out.println(s);
             System.out.println(RemoteRequest.deserializeFromJson(s));
 
-            RemoteIdentifierReply reply = new RemoteIdentifierReply(new Identifier(
-                    InetAddress.getByName("127.0.0.1")), InetAddress.getByName("127.0.0.1"));
-            System.out.println(reply.toString());
-            s = reply.serializeToJson();
-            System.out.println(s);
-            System.out.println(RemoteIdentifierReply.deserializeFromJson(s));
+//            RemoteIdentifierReply reply = new RemoteIdentifierReply(new Identifier(
+//                    InetAddress.getByName("127.0.0.1")), InetAddress.getByName("127.0.0.1"));
+//            System.out.println(reply.toString());
+//            s = reply.serializeToJson();
+//            System.out.println(s);
+//            System.out.println(RemoteIdentifierReply.deserializeFromJson(s));
+//
+//            Map<Identifier, Identifier> map = new HashMap<>();
+//            map.put(new Identifier(InetAddress.getByName("127.0.0.1")), new Identifier(InetAddress.getByName("127.0.0.1")));
+//            map.put(new Identifier(InetAddress.getByName("127.0.0.2")), new Identifier(InetAddress.getByName("127.0.0.3")));
+//            NodeInfo nodeInfo = new NodeInfo(InetAddress.getByName("127.0.0.1"),
+//                    new Identifier(InetAddress.getByName("127.0.0.1")),
+//                    map);
+//            s = nodeInfo.serializeToJson();
+//            System.out.println(s);
+//            System.out.println(NodeInfo.deserializeFromJson(s));
 
         } catch (UnknownHostException e) {
             e.printStackTrace();
